@@ -1,0 +1,15 @@
+#jwt的配置
+jwt:
+  #loginSourceFlag: LoginSource
+  header: Authorization
+  tokenHead: Bearer
+  secret: mySecret
+  access_token:
+    expiration: 604800
+  refresh_token:
+    expiration: 2592000
+  route:
+    authentication:
+      path: auth
+      refresh: refresh
+      register: "auth/register"
