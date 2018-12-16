@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 这个namespace是接口文件的路径 -->
+<mapper namespace="com.pf.demo.mapper.UserMapper">
+	<resultMap type="User" id="baseUserMap">
+		<id column="user_id" property="userId" javaType="java.lang.Integer"/>
+		<result column="user_name" property="userName" javaType="java.lang.String"/>
+		<result column="user_passwd" property="userPass" javaType="java.lang.String"/>
+		<result column="user_age" property="userAge" javaType="java.lang.Integer"/>
+	</resultMap>
+	
+	<!-- 该sql标签里面是需要查询的基本字段 -->
+	<sql id="base_column_list">
+		user_id,user_name,user_passwd,user_age
+	</sql>
+	
+	<!-- 获取所有用户信息接口(getAllUser)的sql -->
+	<!-- include标签是引用上面定义的需要查询的字段信息 -->
+	<select id="getAllUser" resultMap="baseUserMap">
+		select
+		<include refid="base_column_list"></include>
+		from user
+	</select>
+	
+	<!-- 根据id获取某个用户信息（getUserById） -->
+	<select id="getUserById" resultMap="baseUserMap" parameterType="java.lang.Integer">
+		select
+		<include refid="base_column_list"></include>
+		from user
+		where user_id=#{id}
+	</select>
+	
+	
+	<!-- 根据用户名获取某个用户信息（getUserByUserName） -->
+	<!-- 因为该方法只传了一个参并且这里通过userName写判断了，所以Mapper类的getUserByUserName接口的参数必须加@Param("userName")，不然会报错，说userName没有getter()方法 -->
+	<!-- 因为这里会传的参数做了判断，目前有三种方式解决，
+		（1）方法1：若方法只传一个参数则Mapper接口的方法参数必须加@Param注解
+		（2）方法2：mapper接口的方法参数类型设置为实体对象
+		（3）方法3：mapper接口的方法参数类型设置为map类型			
+	 -->
+	<select id="getUserByUserName" resultMap="baseUserMap" parameterType="java.lang.String">
+		select
+		<include refid="base_column_list"></include>
+		from user
+		<where>
+			<if test="userName !=null and userName !=''">
+			and user_name like '%${userName}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getUserByUserName2" resultMap="baseUserMap" parameterType="User">
+		select
+		<include refid="base_column_list"></include>
+		from user
+		<where>
+			<if test="userName !=null and userName !=''">
+			and user_name like '%${userName}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="getUserByUserName3" resultMap="baseUserMap" parameterType="java.util.Map">
+		select
+		<include refid="base_column_list"></include>
+		from user
+		<where>
+			<if test="userName !=null and userName !=''">
+			and user_name like '%${userName}%'
+			</if>
+		</where>
+	</select>	
+	
+	<insert id="addUser" parameterType="User">
+		insert into user(user_name,user_passwd,user_age)
+		values(#{userName},#{userPass},#{userAge})
+	</insert>
+	
+	<update id="updateUser" parameterType="User">
+		update user set user_name=#{userName},user_passwd=#{userPass},user_age=#{userAge}
+		where user_id=#{id}
+	</update>
+	
+	<delete id="deleteUser" parameterType="java.lang.Integer">
+		delete from user where user_id=#{id}
+	</delete>
+</mapper>

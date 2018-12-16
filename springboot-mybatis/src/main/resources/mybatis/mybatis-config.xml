@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD SQL Map Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.pf.demo.entity.User" alias="User"/>
+		<typeAlias type="com.pf.demo.entity.UserRole" alias="UserRole"/>
+		<typeAlias type="com.pf.demo.view.UserView" alias="UserView"/>
+		<typeAlias type="com.pf.demo.entity.Role" alias="Role"/>
+		<typeAlias type="com.pf.demo.entity.Address" alias="Address"/>
+	</typeAliases>
+</configuration>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pf.demo.mapper.UserRoleMapper">
+	<!--循环新增用户角色信息 -->
+	<!-- 
+		forEach属性解析
+		collection：表示传入的参数
+		item：循环体中的具体对象
+		index：集合中的下标值（在list和数组中，index是元素的序号；map中，index是元素的key）
+		open：表示语句以什么开始
+		close：表示语句以什么结束
+		separator：表示在每次进行迭代之间以什么符号作为分隔符
+	 -->
+	<insert id="addUserRole" parameterType="UserRole">
+		insert into user_role(user_id,role_id) values
+		<foreach collection="userRoleList" item="userRole" separator=",">
+			(
+				#{userRole.userId},#{userRole.roleId}
+			)
+		</foreach>
+	</insert>
+	
+	<sql id="userRoleColumn">
+		user_id,role_id
+	</sql>
+	
+	
+	<!-- 根据用户id查看用户角色信息 -->
+	<select id="getUserRole" parameterType="java.lang.Integer" resultType="UserRole">
+		select 
+		<include refid="userRoleColumn"/>
+		from user_role
+		where user_id=#{userId}
+	</select>
+	
+	<!-- 第二种方式：一对多形式查询
+		查看用户角色信息
+	 -->
+	 <sql id="userRoleColumn2">
+	 	u.user_id,u.user_name,u.user_passwd,u.user_age,r.role_id,r.role_name,a.address_id,a.address_name
+	 </sql>
+	 
+	 <resultMap type="UserView" id="userRoleResult">
+	 	<id property="userId" column="user_id" javaType="java.lang.Integer"/>
+	 	<result property="userName" column="user_name" javaType="java.lang.String"/>
+	 	<result property="userPass" column="user_passwd" javaType="java.lang.String"/>
+	 	<result property="userAge" column="user_age" javaType="java.lang.Integer"/>
+	 	<association property="address" javaType="Address">
+	 		<id property="addressId" column="address_id" javaType="java.lang.Integer"/>
+	 		<result property="addressName" column="address_name" javaType="java.lang.String"/>
+	 		<result property="userId" column="user_id" javaType="java.lang.Integer"/>
+	 	</association>
+	 	<collection property="roleList" ofType="Role">
+	 		<id property="roleId" column="role_id" javaType="java.lang.Integer"/>
+	 		<result property="roleName" column="role_name" javaType="java.lang.String"/>
+	 	</collection>
+	 </resultMap>
+	 
+	 <!-- UserView类中有Role类型的集合，所以这里的返回值必须是resultMap，不能用resultType="UserView"，不然会打印为null -->
+	 <select id="getUserRole2" parameterType="java.lang.Integer" resultMap="userRoleResult">
+	 	select <include refid="userRoleColumn2"/>
+	 	from user u 
+	 	join user_role ur on u.user_id = ur.user_id
+	 	join role r on r.role_id = ur.role_id
+	 	join address a on u.user_id = a.user_id
+	 	where u.user_id = #{userId}
+	 </select>
+	 
+</mapper>
